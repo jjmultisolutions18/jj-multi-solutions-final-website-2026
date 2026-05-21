@@ -1,0 +1,188 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common global helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'jjmultisolutions18@gmail.com' && 
+        request.auth.token.email_verified == true
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- ENQUIRIES ---
+    function isValidEnquiry(data) {
+      return data.keys().hasAll(['name', 'email', 'message', 'consent']) &&
+             data.name is string && data.name.size() <= 200 &&
+             data.email is string && data.email.size() <= 200 &&
+             data.message is string && data.message.size() <= 5000 &&
+             data.consent == true;
+    }
+
+    match /enquiries/{enquiryId} {
+      allow create: if isValidId(enquiryId) && isValidEnquiry(incoming()) && incoming().createdAt == request.time;
+      allow read: if isAdmin();
+    }
+
+    // --- QUOTE REQUESTS ---
+    function isValidQuoteRequest(data) {
+      return data.keys().hasAll(['fullName', 'email', 'serviceRequired', 'projectDescription', 'consent']) &&
+             data.fullName is string && data.fullName.size() <= 200 &&
+             data.email is string && data.email.size() <= 200 &&
+             data.serviceRequired is string && data.serviceRequired.size() <= 100 &&
+             data.projectDescription is string && data.projectDescription.size() <= 10000 &&
+             data.consent == true;
+    }
+
+    match /quoteRequests/{quoteId} {
+      allow create: if isValidId(quoteId) && isValidQuoteRequest(incoming()) && incoming().createdAt == request.time;
+      allow read: if isAdmin();
+    }
+
+    // --- BLOGS ---
+    function isValidBlogPost(data) {
+      return data.keys().hasAll(['title', 'slug', 'category', 'content']) &&
+             data.title is string && data.title.size() <= 300 &&
+             data.slug is string && data.slug.size() <= 300 &&
+             data.category is string && data.category.size() <= 100 &&
+             data.content is string;
+    }
+
+    match /blogs/{blogId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidBlogPost(incoming());
+    }
+
+    // --- EVENTS ---
+    function isValidEvent(data) {
+      return data.keys().hasAll(['title', 'date', 'status']) &&
+             data.title is string && data.title.size() <= 300 &&
+             data.status in ['upcoming', 'past', 'ongoing'];
+    }
+
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidEvent(incoming());
+    }
+
+    // --- PROJECTS ---
+    function isValidProject(data) {
+      return data.keys().hasAll(['title', 'category', 'status']) &&
+             data.title is string && data.title.size() <= 300 &&
+             data.category is string && data.category.size() <= 100 &&
+             data.status in ['Completed', 'In Progress', 'Concept'];
+    }
+
+    match /projects/{projectId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidProject(incoming());
+    }
+
+    // --- STORE PRODUCTS ---
+    function isValidStoreProduct(data) {
+      return data.keys().hasAll(['name', 'category', 'shortDescription', 'monthlyPrice', 'annualPrice', 'isActive', 'isFeatured']) &&
+             data.name is string && data.name.size() <= 200 &&
+             data.category is string && data.category.size() <= 150 &&
+             data.shortDescription is string && data.shortDescription.size() <= 2000 &&
+             data.monthlyPrice is number &&
+             data.annualPrice is number &&
+             data.isActive is bool &&
+             data.isFeatured is bool;
+    }
+
+    match /storeProducts/{productId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidStoreProduct(incoming());
+    }
+
+    // --- STORE QUOTATION REQUESTS ---
+    function isValidStoreQuotationRequest(data) {
+      return data.keys().hasAll(['fullName', 'email', 'phone', 'businessName', 'items', 'totalMonthlyAmount', 'totalAnnualAmount', 'status', 'createdAt']) &&
+             data.fullName is string && data.fullName.size() <= 200 &&
+             data.email is string && data.email.size() <= 200 &&
+             data.phone is string && data.phone.size() <= 40 &&
+             data.businessName is string && data.businessName.size() <= 200 &&
+             data.items is list &&
+             data.totalMonthlyAmount is number &&
+             data.totalAnnualAmount is number &&
+             data.status in ['pending', 'approved', 'rejected', 'completed', 'invoice_sent'];
+    }
+
+    match /storeQuotationRequests/{quoteId} {
+      allow create: if isValidId(quoteId) && isValidStoreQuotationRequest(incoming());
+      allow read, list: if isAdmin() || (isSignedIn() && existing().uid == request.auth.uid);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // --- INVOICES ---
+    function isValidInvoice(data) {
+      return data.keys().hasAll(['quoteRequestId', 'customerUid', 'invoiceNumber', 'date', 'dueDate', 'items', 'totalAmount', 'status']) &&
+             data.quoteRequestId is string && data.customerUid is string &&
+             data.invoiceNumber is string && data.invoiceNumber.size() <= 50 &&
+             data.items is list &&
+             data.totalAmount is number &&
+             data.status in ['paid', 'unpaid', 'overdue'];
+    }
+
+    match /invoices/{invoiceId} {
+      allow read, list: if isAdmin() || (isSignedIn() && existing().customerUid == request.auth.uid);
+      allow write: if isAdmin() && isValidInvoice(incoming());
+    }
+
+    // --- SUBSCRIPTIONS ---
+    function isValidSubscription(data) {
+      return data.keys().hasAll(['customerUid', 'productName', 'productId', 'billingCycle', 'price', 'status', 'startDate', 'nextBillingDate']) &&
+             data.customerUid is string &&
+             data.productName is string &&
+             data.productId is string &&
+             data.billingCycle in ['monthly', 'annual'] &&
+             data.price is number &&
+             data.status in ['active', 'cancelled', 'paused'];
+    }
+
+    match /subscriptions/{subscriptionId} {
+      allow read, list: if isAdmin() || (isSignedIn() && existing().customerUid == request.auth.uid);
+      allow write: if isAdmin() && isValidSubscription(incoming());
+    }
+
+    // --- SUPPORT REQUESTS ---
+    function isValidSupportRequest(data) {
+      return data.keys().hasAll(['customerUid', 'customerName', 'customerEmail', 'subject', 'message', 'category', 'status', 'createdAt']) &&
+             data.customerUid is string &&
+             data.customerName is string &&
+             data.customerEmail is string &&
+             data.subject is string && data.subject.size() <= 300 &&
+             data.message is string && data.message.size() <= 5000 &&
+             data.category in ['Technical', 'Billing', 'General'] &&
+             data.status in ['open', 'in_progress', 'resolved'];
+    }
+
+    match /supportRequests/{supportId} {
+      allow create: if isValidId(supportId) && isValidSupportRequest(incoming()) && incoming().customerUid == request.auth.uid;
+      allow read, list: if isAdmin() || (isSignedIn() && existing().customerUid == request.auth.uid);
+      allow update: if isAdmin() || (isSignedIn() && existing().customerUid == request.auth.uid && incoming().status == existing().status);
+      allow delete: if isAdmin();
+    }
+  }
+}
