@@ -27,6 +27,7 @@ export default function Services() {
       icon: Lightbulb,
       title: 'Innovation & Ecosystem Development',
       description: 'Designing and fostering innovation environments for sustainable growth.',
+      image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=600&auto=format&fit=crop',
       items: [
         'Innovation programme design', 'Innovation challenges & Hackathons', 'Ideation workshops', 
         'Design Thinking facilitation', 'Innovation pipeline support', 'Commercialisation readiness', 
@@ -39,6 +40,7 @@ export default function Services() {
       icon: Settings,
       title: 'Rapid Prototyping & Maker Technologies',
       description: 'Bringing physical product ideas to life through advanced fabrication.',
+      image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=600&auto=format&fit=crop',
       items: [
         'Product design', 'Rapid prototyping', '3D printing & 3D scanning', 
         'Reverse engineering', 'CAD design', 'Concept visualisation', 
@@ -50,6 +52,7 @@ export default function Services() {
       icon: Network,
       title: 'ICT & Digital Infrastructure',
       description: 'Robust connectivity and IT foundations for modern enterprises.',
+      image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=600&auto=format&fit=crop',
       items: [
         'MTN Mobile Data & Fixed LTE/5G', 'Telkom LTE', 'Vodacom Fixed LTE', 
         'Network setup', 'Office connectivity', 'IT support', 'Infrastructure consulting'
@@ -60,6 +63,7 @@ export default function Services() {
       icon: Server,
       title: 'Hosting & Domain Services',
       description: 'Secure and reliable digital homes for your web properties.',
+      image: 'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=600&auto=format&fit=crop',
       items: [
         'Domain registration & transfers', 'Website hosting', 'WordPress hosting', 
         'Business email hosting', 'Email setup & technical support', 'Hosting management'
@@ -70,6 +74,7 @@ export default function Services() {
       icon: Code,
       title: 'Digital Systems & App Development',
       description: 'Automating processes with custom software and data solutions.',
+      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop',
       items: [
         'Business process automation', 'Custom web & mobile apps', 'Performance dashboards', 
         'Innovation lab management apps', 'Data tracking & reporting systems', 'Digital transformation support'
@@ -80,6 +85,7 @@ export default function Services() {
       icon: Layout,
       title: 'Website Design & Development',
       description: 'Crafting professional, high-impact web experiences.',
+      image: 'https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=600&auto=format&fit=crop',
       items: [
         'Business websites', 'WordPress & Wix websites', 'AI-assisted website builds', 
         'Website redesign & maintenance', 'Monthly support plans'
@@ -90,6 +96,7 @@ export default function Services() {
       icon: Palette,
       title: 'Branding, Marketing & Design',
       description: 'Visual storytelling that resonates with your target audience.',
+      image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop',
       items: [
         'Poster design', 'Business branding kits', 'Social media content creation', 
         'Marketing campaigns', 'Promotional & Explainer videos', 'Event branding'
@@ -100,6 +107,7 @@ export default function Services() {
       icon: Printer,
       title: 'Printing & Branding Production',
       description: 'Large-scale physical branding and production management.',
+      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop',
       items: [
         'Gazebos & Banners (Pull-up, X-banners)', 'Branded tablecloths', 
         'Vehicle branding & Decals', 'Corporate branding materials', 
@@ -111,6 +119,7 @@ export default function Services() {
       icon: GraduationCap,
       title: 'Training & Skills Development',
       description: 'Upgrading team capabilities in digital and innovative tools.',
+      image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=600&auto=format&fit=crop',
       items: [
         'Canva & AI tools training (ChatGPT, etc.)', 'Website development basics', 
         'Innovation & Entrepreneurship training', 'Design Thinking workshops', 
@@ -122,6 +131,7 @@ export default function Services() {
       icon: Zap,
       title: 'AI & Smart Innovation Infrastructure',
       description: 'Cutting-edge platforms for managing innovation at scale.',
+      image: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?q=80&w=600&auto=format&fit=crop',
       items: [
         'Innovation lab platforms', 'Innovator onboarding systems', 'KPI & Budget tracking', 
         'Programme management tools', 'Mobile innovation lab concepts', 
@@ -185,38 +195,48 @@ export default function Services() {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
           {serviceCategories.map((cat) => (
-            <Card id={cat.id} key={cat.id} className="group relative bg-card border-border hover:border-primary/50 transition-all duration-300 overflow-hidden scroll-mt-32">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-500"></div>
-              
-              <CardHeader className="pb-4 relative">
-                <div className="w-14 h-14 bg-secondary/10 rounded-xl flex items-center justify-center text-secondary mb-6 group-hover:scale-110 transition-transform">
-                  <cat.icon size={28} />
+            <Card id={cat.id} key={cat.id} className="group relative bg-card border-border hover:border-primary/50 transition-all duration-300 overflow-hidden scroll-mt-32 flex flex-col justify-between">
+              <div>
+                <div className="aspect-[16/10] overflow-hidden relative bg-muted">
+                  <img 
+                    src={cat.image} 
+                    alt={cat.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent"></div>
                 </div>
-                <CardTitle className="text-2xl font-bold font-heading">{cat.title}</CardTitle>
-                <CardDescription className="text-muted-foreground mt-2 leading-relaxed">
-                  {cat.description}
-                </CardDescription>
-              </CardHeader>
-              
-              <CardContent className="relative pb-6">
-                <Accordion type="single" collapsible className="w-full border-none">
-                  <AccordionItem value="items" className="border-none">
-                    <AccordionTrigger className="py-2 text-primary font-bold text-sm tracking-widest uppercase hover:no-underline hover:text-secondary flex justify-start gap-2">
-                       Explore Services
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-4">
-                      <ul className="grid grid-cols-1 gap-3">
-                        {cat.items.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-3 text-sm text-foreground/80 leading-snug">
-                            <Plus size={14} className="text-secondary shrink-0 mt-0.5" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </CardContent>
+
+                <CardHeader className="pb-4 relative pt-10">
+                  <div className="absolute -top-7 right-6 w-14 h-14 bg-secondary text-white shadow-lg rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform z-10">
+                    <cat.icon size={26} />
+                  </div>
+                  <CardTitle className="text-2xl font-bold font-heading pr-12">{cat.title}</CardTitle>
+                  <CardDescription className="text-muted-foreground mt-2 leading-relaxed">
+                    {cat.description}
+                  </CardDescription>
+                </CardHeader>
+                
+                <CardContent className="relative pb-6">
+                  <Accordion type="single" collapsible className="w-full border-none">
+                    <AccordionItem value="items" className="border-none">
+                      <AccordionTrigger className="py-2 text-primary font-bold text-sm tracking-widest uppercase hover:no-underline hover:text-secondary flex justify-start gap-2">
+                         Explore Services
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-4">
+                        <ul className="grid grid-cols-1 gap-3">
+                          {cat.items.map((item, idx) => (
+                            <li key={idx} className="flex items-start gap-3 text-sm text-foreground/80 leading-snug">
+                              <Plus size={14} className="text-secondary shrink-0 mt-0.5" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </div>
               
               <CardFooter className="relative border-t border-border/50 bg-muted/20">
                 <Button asChild variant="ghost" className="w-full justify-between hover:bg-transparent group/btn p-0">

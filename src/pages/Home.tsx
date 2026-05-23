@@ -30,14 +30,26 @@ export default function Home() {
       />
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <img 
+        {/* Animated Cinematic Background Tech Image */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <motion.img 
             src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop" 
             alt="JJ Multi Solutions Innovation Hero"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover origin-center"
+            initial={{ scale: 1.12, x: -10, y: -5 }}
+            animate={{ 
+              scale: [1.12, 1.01, 1.10, 1.12],
+              x: [-10, 10, -5, -10],
+              y: [-5, 5, 10, -5],
+              rotate: [0, 1, -1, 0]
+            }}
+            transition={{ 
+              duration: 32, 
+              ease: "linear", 
+              repeat: Infinity,
+            }}
           />
-          <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px]"></div>
+          <div className="absolute inset-0 bg-white/75 backdrop-blur-[1px]"></div>
           
           {/* Animated Glows */}
           <div className="absolute top-1/4 -left-1/4 w-1/2 h-1/2 bg-primary/20 rounded-full blur-[120px] animate-pulse"></div>

@@ -175,6 +175,75 @@ export const SEEDED_PRODUCTS: Omit<StoreProduct, 'id'>[] = [
   }
 ];
 
+// Dynamically import and map entire DBUY products catalog for the web store
+import { DBUY_PRODUCTS } from '../data/dbuy_products';
+
+const MAPPED_DBUY_SEEDS: Omit<StoreProduct, 'id'>[] = DBUY_PRODUCTS.map(p => {
+  let monthlyPrice = 0;
+  let annualPrice = 0;
+  
+  if (p.billing_cycle === 'Monthly') {
+    monthlyPrice = p.recommended_selling_price_zar;
+    annualPrice = Math.round(p.recommended_selling_price_zar * 12 * 0.9); // 10% annual discount
+  } else if (p.billing_cycle === 'Annual') {
+    monthlyPrice = Math.round(p.recommended_selling_price_zar / 12);
+    annualPrice = p.recommended_selling_price_zar;
+  } else { // Once-off
+    monthlyPrice = 0;
+    annualPrice = p.recommended_selling_price_zar;
+  }
+
+  function getProductImage(productId: string, category: string): string {
+    if (productId.includes('m365')) return 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&auto=format&fit=crop&q=60';
+    if (productId.includes('adobe')) return 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=600&auto=format&fit=crop&q=60';
+    if (productId.includes('corel')) return 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&auto=format&fit=crop&q=60';
+    if (productId.includes('autocad')) return 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=60';
+    if (productId.includes('fusion') || productId.includes('sketchup')) return 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=600&auto=format&fit=crop&q=60';
+    if (productId.includes('kaspersky') || productId.includes('bitdefender') || productId.includes('eset')) return 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&auto=format&fit=crop&q=60';
+    if (productId.includes('sage') || productId.includes('zoho')) return 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=60';
+    
+    switch(category) {
+      case 'Productivity & Office Software':
+        return 'https://images.unsplash.com/photo-1627409212872-46723f5ab52c?w=600&auto=format&fit=crop&q=60';
+      case 'Graphic Design & Creative Software':
+        return 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&auto=format&fit=crop&q=60';
+      case 'CAD & Engineering Design Software':
+        return 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=60';
+      case 'Cybersecurity & Antivirus':
+        return 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&auto=format&fit=crop&q=60';
+      case 'PDF & Document Management':
+        return 'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?w=600&auto=format&fit=crop&q=60';
+      case 'Operating Systems & Server Software':
+        return 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&auto=format&fit=crop&q=60';
+      case 'Business & Accounting Software':
+        return 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=60';
+      case 'Cloud & Hosting Services':
+        return 'https://images.unsplash.com/photo-1627409212872-46723f5ab52c?w=600&auto=format&fit=crop&q=60';
+      case 'Connectivity & Communication Tools':
+        return 'https://images.unsplash.com/photo-1562408590-e32931084e23?w=600&auto=format&fit=crop&q=60';
+      default:
+        return 'https://images.unsplash.com/photo-1432821596592-e2c18b78144f?w=600&auto=format&fit=crop&q=60';
+    }
+  }
+
+  return {
+    name: p.product_name,
+    category: p.category,
+    shortDescription: p.description,
+    features: p.key_features,
+    monthlyPrice,
+    annualPrice,
+    imageUrl: getProductImage(p.product_id, p.category),
+    isActive: true,
+    isFeatured: p.recommended_badge === 'Best Value' || p.recommended_badge === 'Popular' || p.recommended_badge === 'Premium',
+    createdAt: new Date().toISOString()
+  };
+});
+
+// Append the newly structured DBUY digital catalog products
+SEEDED_PRODUCTS.push(...MAPPED_DBUY_SEEDS);
+
+
 // Helper to check and seed default products if empty
 export async function seedProductsIfEmpty(): Promise<StoreProduct[]> {
   try {
@@ -213,10 +282,25 @@ export async function getProducts(): Promise<StoreProduct[]> {
       list.push({ id: docRef.id, ...(docRef.data() as any) } as StoreProduct);
     });
     
-    // If DB is empty, let's seed & return
-    if (list.length === 0) {
-      return await seedProductsIfEmpty();
+    // Check if any of the new structured DBUY products are missing from the Firestore database
+    const existingNames = new Set(list.map(p => p.name.toLowerCase()));
+    const missingSeeds = SEEDED_PRODUCTS.filter(p => !existingNames.has(p.name.toLowerCase()));
+    
+    if (missingSeeds.length > 0) {
+      console.log(`Syncing ${missingSeeds.length} new DBUY master catalog items...`);
+      for (const p of missingSeeds) {
+        try {
+          const docId = p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          const docRef = doc(db, PRODUCTS_COL, docId);
+          await setDoc(docRef, p);
+          list.push({ id: docId, ...p } as StoreProduct);
+        } catch (e) {
+          console.error(`Sync error for product ${p.name}:`, e);
+          list.push({ id: `offline-dbuy-${p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`, ...p } as StoreProduct);
+        }
+      }
     }
+    
     return list;
   } catch (error) {
     console.warn('Cannot fetch products from live DB, providing local items:', error);

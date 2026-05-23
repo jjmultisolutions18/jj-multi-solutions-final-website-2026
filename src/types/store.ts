@@ -25,7 +25,16 @@ export type StoreCategory =
   | 'Hosting & Domains'
   | 'Design & Creative'
   | 'Business Software'
-  | 'Connectivity & Communications';
+  | 'Connectivity & Communications'
+  | 'Productivity & Office Software'
+  | 'Graphic Design & Creative Software'
+  | 'CAD & Engineering Design Software'
+  | 'Cybersecurity & Antivirus'
+  | 'PDF & Document Management'
+  | 'Operating Systems & Server Software'
+  | 'Business & Accounting Software'
+  | 'Cloud & Hosting Services'
+  | 'Connectivity & Communication Tools';
 
 export interface EnquiryBasketItem {
   product: StoreProduct;

@@ -1,6 +1,7 @@
 import React from 'react';
 import Navbar from './Navbar';
 import { Footer, WhatsAppButton } from './Footer';
+import Chatbot from '@/components/chat/Chatbot';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ export default function Layout({ children }: LayoutProps) {
       </main>
       <Footer />
       <WhatsAppButton />
+      <Chatbot />
     </div>
   );
 }

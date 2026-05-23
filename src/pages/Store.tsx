@@ -21,7 +21,11 @@ import {
   FileText,
   User,
   ExternalLink,
-  Info
+  Info,
+  Palette,
+  Server,
+  Settings,
+  Briefcase
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
@@ -273,6 +277,18 @@ export default function Store() {
       case 'Business Internet (Fibre/LTE/5G)': return <Wifi className="text-purple-500" size={18} />;
       case 'Cloud Backup': return <Cloud className="text-sky-500" size={18} />;
       case 'IT Support Packages': return <HeartHandshake className="text-orange-500" size={18} />;
+      
+      // New 9 DBUY Categories Mapping
+      case 'Productivity & Office Software': return <Mail className="text-blue-500" size={18} />;
+      case 'Graphic Design & Creative Software': return <Palette className="text-pink-500" size={18} />;
+      case 'CAD & Engineering Design Software': return <Settings className="text-amber-500" size={18} />;
+      case 'Cybersecurity & Antivirus': return <ShieldCheck className="text-red-600" size={18} />;
+      case 'PDF & Document Management': return <FileText className="text-orange-600" size={18} />;
+      case 'Operating Systems & Server Software': return <Server className="text-indigo-500" size={18} />;
+      case 'Business & Accounting Software': return <Briefcase className="text-cyan-500" size={18} />;
+      case 'Cloud & Hosting Services': return <Cloud className="text-emerald-500" size={18} />;
+      case 'Connectivity & Communication Tools': return <Wifi className="text-violet-500" size={18} />;
+      
       default: return <SlidersHorizontal className="text-gray-500" size={18} />;
     }
   };
@@ -288,8 +304,17 @@ export default function Store() {
 
   const featuredProducts = products.filter(p => p.isFeatured && p.isActive);
 
-  // Lists of priority first launches
+  // Lists of priority first launches (Original + Structured DBUY Categories)
   const priorityCategories: StoreCategory[] = [
+    'Productivity & Office Software',
+    'Graphic Design & Creative Software',
+    'CAD & Engineering Design Software',
+    'Cybersecurity & Antivirus',
+    'PDF & Document Management',
+    'Operating Systems & Server Software',
+    'Business & Accounting Software',
+    'Cloud & Hosting Services',
+    'Connectivity & Communication Tools',
     'Microsoft 365 & Business Email',
     'Website Hosting & Domains',
     'Antivirus & Security',
